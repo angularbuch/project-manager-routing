@@ -13,13 +13,9 @@ li {
   padding-right: 15px;
 }
 
-
-#right {
-  float: right;
-  width: 400px;
+.settings-icon {
+  font-size: 33px;
+  margin: 5px;
+  color: lightgrey;
 }
 
-#left {
-  float: left;
-  width: calc(100% - 400px);
-}

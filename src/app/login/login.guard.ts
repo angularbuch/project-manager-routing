@@ -1,31 +1,36 @@
-import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable} from 'rxjs';
-import {LoginService} from '../services/login-service/login-service';
+import { Injectable } from '@angular/core';
+import {
+  ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree
+} from '@angular/router';
+import { LoginService } from '../services/login-service/login-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LoginGuard implements CanActivate, CanLoad {
-  constructor(private loginService: LoginService, private router: Router) {
+export class LoginGuard implements CanActivate, CanActivateChild {
+
+  constructor(private loginService: LoginService,
+              private router: Router) {
   }
 
-  private checkLogin(redirect: string) {
+  canActivate(routeSnapshot: ActivatedRouteSnapshot,
+              routerSnapshot: RouterStateSnapshot):  boolean | UrlTree {
+
+    return this.checkLogin(routerSnapshot);
+  }
+
+  canActivateChild(childRoute: ActivatedRouteSnapshot, routerSnapshot: RouterStateSnapshot): boolean | UrlTree {
+    return this.checkLogin(routerSnapshot);
+  }
+
+  checkLogin(routerSnapshot: RouterStateSnapshot) {
+    console.log('checking login')
     if (!this.loginService.isLoggedIn()) {
-      this.router.navigate(['/login'], {queryParams: {redirect: redirect}});
-      return false;
+      const url = encodeURI(routerSnapshot.url);
+      return this.router.createUrlTree(['/login'], {queryParams: {redirect: url}});
+      //this.router.navigate(['/login'], {queryParams: {redirect: redirect}});
     }
     return true;
   }
 
-  canActivate(routeSnapshot: ActivatedRouteSnapshot,
-              routerSnapshot: RouterStateSnapshot): Observable<boolean> | boolean {
-    const redirect = encodeURI(routerSnapshot.url);
-    return this.checkLogin(redirect);
-  }
-
-  canLoad(route: Route): Observable<boolean> | boolean {
-    const redirect = encodeURI(route.path || '');
-    return this.checkLogin(redirect);
-  }
 }

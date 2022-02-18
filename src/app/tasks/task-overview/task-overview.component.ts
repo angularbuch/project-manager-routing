@@ -1,43 +1,29 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import * as model from '../../shared/models/model-interfaces';
-import {Task} from '../../shared/models/model-interfaces';
-import {TaskService} from '../../shared/task-service/task.service';
+import {Task} from '../../models/model-interfaces';
+import {TaskService} from '../../services/task-service/task-service';
+import * as model from '../../models/model-interfaces';
+import { filter } from 'rxjs/operators';
+
 
 @Component({
-  templateUrl: './task-overview.component.html',
-  styleUrls: ['./task-overview.component.css'],
+  selector: 'task-overview',
+  templateUrl: 'task-overview.component.html',
+  styleUrls: ['task-overview.component.css'],
 })
-export class TaskOverviewComponent {
-
-  id?: string;
+export class TaskOverviewComponent implements OnInit {
 
   model = model;
 
-  showSuccessLabel = false;
-
-  task?: Task;
+  task: Task | undefined;
 
   constructor(private route: ActivatedRoute,
-              private taskService: TaskService) {
-  }
+              private taskService: TaskService) { }
 
   ngOnInit() {
-    this.route.params.subscribe((params) => {
-      this.taskService.getTask(params['id']).subscribe(task => {
-        this.task = task;
-      });
+    this.route.params.pipe(filter(params => params['id']))
+    .subscribe(params => {
+      this.task = this.taskService.getTask(params['id']);
     });
-  }
-
-  saveTask() {
-    this.taskService.saveTask(this.task!)
-      .subscribe(task => {
-        this.task = task;
-        this.showSuccessLabel = true;
-        setTimeout(() => {
-          this.showSuccessLabel = false;
-        }, 2000);
-      });
   }
 }

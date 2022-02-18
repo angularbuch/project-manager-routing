@@ -1,7 +1,14 @@
-import {Directive} from '@angular/core';
-import {AbstractControl, FormControl, NG_VALIDATORS} from '@angular/forms';
+import {Directive, forwardRef} from '@angular/core';
+import {
+  FormControl,
+  AbstractControl,
+  NG_VALIDATORS,
+  NG_ASYNC_VALIDATORS
+} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
-export function asyncIfNotBacklogThenAssignee(control: FormControl): Promise<any> {
+export function asyncIfNotBacklogThenAssignee(control: AbstractControl): Promise<any> {
   const promise = new Promise((resolve, reject) => {
     setTimeout(() => {
       resolve(ifNotBacklogThanAssignee(control));
@@ -10,7 +17,7 @@ export function asyncIfNotBacklogThenAssignee(control: FormControl): Promise<any
   return promise;
 }
 
-export function ifNotBacklogThanAssignee(formGroup: FormControl): { [key: string]: any } | null {
+export function ifNotBacklogThanAssignee(formGroup: AbstractControl): {[key: string]: any} | null {
   const nameControl = formGroup.get('assignee.name');
   const stateControl = formGroup.get('state');
   if (!nameControl || !stateControl) {
@@ -24,7 +31,7 @@ export function ifNotBacklogThanAssignee(formGroup: FormControl): { [key: string
 }
 
 @Directive({
-  selector: '[ifNotBacklogThanAssignee]',
+  selector: '[pjmIfNotBacklogThanAssignee]',
   providers: [
     {
       provide: NG_VALIDATORS,
@@ -33,7 +40,7 @@ export function ifNotBacklogThanAssignee(formGroup: FormControl): { [key: string
 })
 export class IfNotBacklogThanAssigneeValidatorDirective {
 
-  public validate(formGroup: AbstractControl): { [key: string]: any } | null {
+  public validate(formGroup: AbstractControl): {[key: string]: any} | null {
     const nameControl = formGroup.get('assignee.name');
     const stateControl = formGroup.get('state');
     if (!nameControl || !stateControl) {
@@ -48,14 +55,15 @@ export class IfNotBacklogThanAssigneeValidatorDirective {
 }
 
 @Directive({
-  selector: '[emailValidator]',
+  selector: '[pjmEmailValidator]',
   providers: [{
     provide: NG_VALIDATORS,
-    useExisting: EmailValidatorDirective, multi: true
+    useClass: EmailValidatorDirective,
+    multi: true
   }]
 })
 export class EmailValidatorDirective {
-  validate(control: AbstractControl): { [key: string]: any } | null {
+  validate(control: AbstractControl): {[key: string]: any} | null {
     const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     if (!control.value || control.value === '' || re.test(control.value)) {
       return null;
@@ -65,24 +73,15 @@ export class EmailValidatorDirective {
   }
 }
 
-export function emailValidator(control: AbstractControl): { [key: string]: any } | null {
+export function emailValidator(control: AbstractControl): {[key: string]: any} | null {
   return new EmailValidatorDirective().validate(control);
 }
 
-export function emailValidator2(control: AbstractControl): { [key: string]: any } | null {
+export function emailValidator2(control: AbstractControl): {[key: string]: any} | null {
   const re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
   if (!control.value || control.value === '' || re.test(control.value)) {
     return null;
   } else {
     return {'invalidEMail': true};
   }
-}
-
-@Directive({
-  selector: '[emailValidator]',
-  providers: [
-    {provide: NG_VALIDATORS, useValue: emailValidator, multi: true}
-  ]
-})
-export class EmailValidatorWithFunctionDirective {
 }

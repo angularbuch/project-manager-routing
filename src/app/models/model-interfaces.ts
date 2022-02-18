@@ -1,12 +1,10 @@
 export interface Tag {
   label: string;
 }
-
 export interface User {
   name?: string;
   email?: string;
 }
-
 export interface Task {
   id?: number;
   title?: string;
@@ -14,7 +12,7 @@ export interface Task {
   tags?: Tag[];
   favorite?: boolean;
   state?: string;
-  assignee: User;
+  assignee?: User;
 }
 
 export const states = ['BACKLOG', 'IN_PROGRESS', 'TEST', 'COMPLETED'];
@@ -43,16 +41,16 @@ export const stateGroups = [
   }
 ];
 
-export const stateTexts: any = {
+export const stateTexts: Record<string, string> = {
   'BACKLOG': 'Backlog',
   'IN_PROGRESS': 'In Bearbeitung',
   'TEST': 'Im Test',
   'COMPLETED': 'Abgeschlossen'
 };
 
-export const statesAsObjects = [{name: 'BACKLOG', text: 'Backlog'},
-  {name: 'IN_PROGRESS', text: 'In Bearbeitung'},
-  {name: 'TEST', text: 'Test'},
-  {name: 'COMPLETED', text: 'Abgeschlossen'}];
+export const statesAsObjects  = [{ name: 'BACKLOG', text: 'Backlog'},
+  { name: 'IN_PROGRESS', text: 'In Bearbeitung'},
+  { name: 'TEST', text: 'Test'},
+  { name: 'COMPLETED', text: 'Abgeschlossen'}];
 
 

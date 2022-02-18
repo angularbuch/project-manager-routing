@@ -1,9 +1,8 @@
 import {Component} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {LoginService} from '../services/login-service/login-service';
 
 @Component({
-  selector: 'login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -12,7 +11,8 @@ export class LoginComponent {
 
   constructor(private loginService: LoginService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+  ) {
 
   }
 

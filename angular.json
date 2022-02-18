@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "project-manager-modular": {
+    "project-manager-routing": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:application": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/project-manager-modular",
+            "outputPath": "dist/project-manager-routing",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -74,10 +74,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "project-manager-modular:build:production"
+              "browserTarget": "project-manager-routing:build:production"
             },
             "development": {
-              "browserTarget": "project-manager-modular:build:development"
+              "browserTarget": "project-manager-routing:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -85,7 +85,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "project-manager-modular:build"
+            "browserTarget": "project-manager-routing:build"
           }
         },
         "test": {
@@ -114,5 +114,5 @@
       }
     }
   },
-  "defaultProject": "project-manager-modular"
+  "defaultProject": "project-manager-routing"
 }

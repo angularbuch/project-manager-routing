@@ -1,7 +1,6 @@
 body {
-    padding-left: 20px;
+  padding-left: 20px;
   padding-top: 50px;
-
 }
 
 .tabs-container {
@@ -33,6 +32,15 @@ form {
   padding-bottom: 10px;
 }
 
+#right {
+  float: right;
+  width: 300px;
+}
+#left {
+  float: left;
+  width: calc(100% - 300px);
+}
+
 #footer {
   position: fixed;
   bottom: 0;
@@ -44,6 +52,13 @@ form {
   float: left;
   padding-right: 10px;
 }
+
 #right {
   overflow: hidden
+}
+
+.chat-button {
+  position: absolute;
+  bottom: -2px;
+  right: 10px;
 }

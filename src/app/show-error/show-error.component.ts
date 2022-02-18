@@ -1,5 +1,5 @@
-import {Component, Input} from '@angular/core';
-import {FormGroup, NgForm} from '@angular/forms';
+import { Component, Input, OnInit, Optional} from '@angular/core';
+import {FormGroup, FormGroupDirective, NgForm} from '@angular/forms';
 
 @Component({
   selector: 'show-error',
@@ -10,25 +10,29 @@ import {FormGroup, NgForm} from '@angular/forms';
       </div>
     </div>`
 })
-export class ShowErrorComponent {
+export class ShowErrorComponent implements OnInit {
 
-  @Input('path') controlPath = '';
+  @Input('path') path = '';
   @Input('text') displayName = '';
 
-  private form: FormGroup;
+  private form!: FormGroup;
 
-  constructor(ngForm: NgForm) {
-    this.form = ngForm.form;
+  constructor(@Optional() private ngForm: NgForm,
+              @Optional() private formGroup: FormGroupDirective) {
+  }
+
+  ngOnInit() {
+    this.form = this.ngForm ? this.ngForm.form : this.formGroup.form;
   }
 
   get errorMessages(): string[] | null {
-    const control = this.form.get(this.controlPath);
+
+    const control = this.form.get(this.path);
     const messages = [];
     if (!control || !(control.touched) || !control.errors) {
       return null;
     }
     for (const code in control.errors) {
-      // Berechnung der lesbaren Fehlermeldungen
       if (control.errors.hasOwnProperty(code)) {
         const error = control.errors[code];
         let message = '';

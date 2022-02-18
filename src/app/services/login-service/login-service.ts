@@ -1,26 +1,56 @@
 import {Inject, Injectable, Optional} from '@angular/core';
+import {NEVER, Observable, of} from 'rxjs';
 import {AUTH_ENABLED} from '../../app.tokens';
 
 const CURRENT_USER = 'currentUser';
 
-@Injectable()
-export class LoginService {
+export class User {
 
-  USERS = [
-    {name: 'admin', password: 'admin', rights: ['edit_tasks', 'change_settings']},
-    {name: 'user', password: 'secret', rights: ['edit_tasks']}
-  ];
-
-  constructor(@Optional() @Inject(AUTH_ENABLED) public authEnabled = false) {
+  static create(data: any) {
+    return new User(data.firstName, data.lastName, data.userName, data.password, data.rights);
   }
 
-  login(name: string, password: string) {
-    const [user] = this.USERS.filter(u => u.name === name);
+  constructor(public firstName: string,
+              public lastName: string,
+              public userName: string,
+              public password: string,
+              public rights: string[]) {
+  }
+
+
+  hasRight(right: string) {
+    return this.rights.find(elem => elem === right) !== null;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoginService {
+
+  USERS: User[] = [
+    new User('John', 'Admin', 'admin', 'secret', ['edit_tasks', 'change_settings']),
+    new User('Jane', 'User', 'user', 'secret', ['edit_tasks'])
+  ];
+
+  constructor(@Optional() @Inject(AUTH_ENABLED) private authEnabled = false) {
+  }
+
+  login(userName: string, password: string) {
+    const [user] = this.USERS.filter(user_ => user_.userName === userName);
     if (user && user.password === password) {
       localStorage.setItem(CURRENT_USER, JSON.stringify(user));
       return true;
     }
     return false;
+  }
+
+  getCurrentUser(): Observable<User> {
+    const userString = localStorage.getItem(CURRENT_USER);
+    if (userString) {
+      return of(User.create(JSON.parse(userString)));
+    }
+    return NEVER;
   }
 
   logout() {
@@ -39,3 +69,4 @@ export class LoginService {
   }
 
 }
+

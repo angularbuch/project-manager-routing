@@ -19,7 +19,7 @@
           <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
             <a routerLink='/tasks' class="link">Aufgaben</a>
           </li>
-          <li routerLinkActive="active">
+          <li routerLinkActive="active" (isActiveChange)="settingsPageActive = $event">
             <a routerLink='/settings' class="link">Einstellungen</a>
           </li>
           <li routerLinkActive="active">
@@ -32,51 +32,70 @@
         </ul>
 
         <ul class="nav navbar-nav" style="float: right">
-          <li>
-            <a href="#">
-              <span class="badge">
-                  In Bearbeitung: {{numberInProgress}}
-              </span>
-            </a>
-          </li>
 
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-               aria-expanded="false">
-              Schnellzugriff
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a [routerLink]="['/tasks']" [queryParams]="{query: 'BACKLOG'}">Backlog</a>
-              </li>
-              <li>
-                <a [routerLink]="['/tasks']" [queryParams]="{query: 'IN_PROGRESS'}">In Bearbeitung</a>
-              </li>
-              <li>
-                <a [routerLink]="['/tasks']" [queryParams]="{query: 'TEST'}">Im Test</a>
-              </li>
-              <li>
-                <a [routerLink]="['/tasks']" [queryParams]="{query: 'COMPLETED'}">Abgeschlossen</a>
-              </li>
-            </ul>
-          </li>
+            <li *ngIf="settingsPageActive">
+              <span class="glyphicon glyphicon-cog settings-icon"></span>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                Schnellzugriff
+                <span class="caret"></span>
+              </a>
+                  <ul class="dropdown-menu">
+<!--
+                    <li>
+                      <a [routerLink]="['/tasks', {query: 'BACKLOG'}]">Backlog</a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/tasks', {query: 'IN_PROGRESS'}]">In Bearbeitung</a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/tasks', {query: 'TEST'}]">Im Test</a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/tasks', {query: 'COMPLETED'}]">Abgeschlossen</a>
+                    </li>
+-->
+                    <li>
+                      <a [routerLink]="['/tasks']" [queryParams]="{query: 'BACKLOG'}">Backlog</a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/tasks']" [queryParams]="{query: 'IN_PROGRESS'}">In Bearbeitung</a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/tasks']" [queryParams]="{query: 'TEST'}">Im Test</a>
+                    </li>
+                    <li>
+                      <a [routerLink]="['/tasks']" [queryParams]="{query: 'COMPLETED'}">Abgeschlossen</a>
+                    </li>
 
-          <li *ngIf="authEnabled">
-            <a *ngIf="loginService.isLoggedIn()" (click)="logout()" class="link">Abmelden</a>
-            <a *ngIf="!loginService.isLoggedIn()" [routerLink]="['/login']" class="link">Anmelden</a>
-          </li>
-        </ul>
+                  </ul>
+            </li>
+
+            <li *ngIf="authEnabled">
+              <a *ngIf="loginService.isLoggedIn()" (click)="logout()" class="link">Abmelden</a>
+              <a *ngIf="!loginService.isLoggedIn()" [routerLink]="['/login']" class="link">Anmelden</a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-</div>
-<div class="content">
-  <div id="left">
-    <router-outlet></router-outlet>
   </div>
-  <div id="right">
-    <router-outlet name="right"></router-outlet>
+  <div class="content">
+    <div id="left">
+      <router-outlet></router-outlet>
+    </div>
+    <div id="right">
+      <router-outlet name="right"></router-outlet>
+    </div>
   </div>
-</div>
+  <div id="footer">
+    <router-outlet name="bottom"></router-outlet>
+  </div>
+  <!--<a [routerLink]="[ {outlets: {'bottom': 'chat'}}]">Chat öffnen</a>-->
+
+<button type="button" class="btn btn-primary chat-button"
+        (click)="toggleChat()">
+  <span class="glyphicon glyphicon-comment"></span>
+</button>

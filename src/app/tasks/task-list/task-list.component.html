@@ -1,8 +1,8 @@
 <div class="task-list">
   <h1>Aufgaben durchsuchen</h1>
   <div class="input-group search-bar">
-    <input id="search-tasks"
-           type="text" #query class="form-control"
+    <input type="text" #query class="form-control"
+           id="searchField"
            (keyup.enter)="findTasks(query.value)"
            [formControl]="searchTerm">
     <span class="input-group-btn">
@@ -13,17 +13,14 @@
     </span>
   </div>
 
-  <ng-container *ngIf="tasks$ | async as tasks">
-    <pjm-task-item *ngFor="let task of tasks"
-                   [task]="task"
-                   (taskDelete)="deleteTask(task)"
-                   (taskSelected)="selectTask($event)"
-                   [selected]="task.id == selectedTaskId">
-    </pjm-task-item>
-
-      <div class="alert alert-info" *ngIf="tasks.length === 0">Keine Aufgaben vorhanden</div>
-  </ng-container>
-
+  <div>
+    <task-item *ngFor="let task of tasks"
+               [task]="task"
+               (taskDelete)="deleteTask(task)"
+               (taskSelected)="selectTask($event)"
+               [selected]="task.id == selectedTaskId">
+    </task-item>
+  </div>
   <br>
   <a routerLink='./new' class="pull-right btn btn-success">
     Neue Aufgabe anlegen

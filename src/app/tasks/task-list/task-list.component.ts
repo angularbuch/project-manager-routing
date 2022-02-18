@@ -2,73 +2,88 @@ import {Component, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 
 import {FormControl} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {merge, Observable} from 'rxjs';
-import {debounceTime, switchMap, tap} from 'rxjs/operators';
-import {distinctUntilChanged, map} from 'rxjs/operators';
-import {TaskService} from '../../shared/task-service/task.service';
-import {Task} from '../../shared/models/model-interfaces';
-import {SuperSecretCalculationService} from '../../super-secret-calculation.service';
-import {AbstractCacheService} from '../../cache/abstract-cache.service';
+import {Task} from '../../models/model-interfaces';
+import {TaskService} from '../../services/task-service/task-service';
+import {Router, ActivatedRoute} from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
-  selector: 'pjm-task-list',
+  selector: 'task-list',
   templateUrl: './task-list.component.html',
-  styleUrls: ['./task-list.component.css']
+  styleUrls: ['./task-list.component.css'],
+  providers: [TaskService],
 })
 export class TaskListComponent implements OnInit {
 
   selectedTaskId: string | number | null = null;
 
-  tasks$!: Observable<Task[]>;
+  tasks!: Task[];
 
   searchTerm = new FormControl();
 
   constructor(private taskService: TaskService,
-              private router: Router,
               private route: ActivatedRoute,
-              private cacheService: AbstractCacheService,
-              private secretService: SuperSecretCalculationService,
+              private router: Router,
               private location: Location) {
   }
 
   ngOnInit() {
 
-    console.log(this.cacheService.get('ANSWER'));
+    this.route.queryParams.subscribe((params) => {
+      const query = decodeURI(params['query'] ?? '');
+      this.searchTerm.setValue(query);
+      this.tasks = this.taskService.findTasks(query);
+    });
 
-    this.tasks$ = this.taskService.tasks$;
+    this.route.fragment.subscribe((fragment) => {
+      if (!fragment) { return; }
+      const [key, value] = fragment.split('=');
+      if (key === 'select' && value !== undefined) {
+        this.selectTask(value);
+      }
+    });
 
-    const paramsStream = this.route.queryParams
-      .pipe(
-        map(params => decodeURI(params['query'] || '')),
-        tap(query => this.searchTerm.setValue(query)));
 
-    const searchTermStream = this.searchTerm.valueChanges.pipe(
-      debounceTime(400),
-      tap(query => this.adjustBrowserUrl(query))
-    );
+    // Alternative Umsetzung auf Basis von Matrix-Parametern
+    /*
+     this.route.params.subscribe((params) => {
+     const query = decodeURI(params['query'] || '');
+     this.searchTerm.setValue(query);
+     this.tasks = this.taskService.findTasks(query);
+     });
+     */
 
-    merge(paramsStream, searchTermStream)
-      .pipe(
-        distinctUntilChanged(),
-        switchMap((query: string) => this.taskService.findTasks(query)))
-      .subscribe();
+    // Statisches Auslesen von Parametern über Snapshots
+    /*
+    const query = this.route.snapshot.queryParams['query'];
+    this.tasks = this.taskService.findTasks(query);
+
+    const fragment = this.route.snapshot.fragment;
+    if (fragment) {
+      const [key, value] = fragment.split('=');
+      if (key === 'select' && value !== undefined) {
+        this.selectTask(value);
+      }
+    }
+     */
   }
-
 
   deleteTask(task: Task) {
-    this.taskService.deleteTask(task).subscribe();
+    this.taskService.deleteTask(task);
+    this.findTasks(this.searchTerm.value);
   }
 
-  selectTask(taskId: string | number) {
+  selectTask(taskId: string) {
     this.selectedTaskId = taskId;
-    this.router.navigate([{outlets: {'right': ['overview', taskId]}}], {relativeTo: this.route});
+
+    this.router.navigate([ {outlets: {'right': [ 'overview' , taskId]}}], {
+      relativeTo: this.route
+    });
   }
 
   findTasks(queryString: string) {
-    // jetzt über type-ahead gelöst
-    // this.tasks$ = this.taskService.findTasks(queryString);
-    // this.adjustBrowserUrl(queryString);
+    this.tasks = this.taskService.findTasks(queryString);
+    this.adjustBrowserUrl(queryString);
   }
 
   adjustBrowserUrl(queryString = '') {
